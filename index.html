@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIFF テスト</title>
+    <title>LIFF デバッグ</title>
     <script src="https://static.line-scdn.net/liff/2.22.1/sdk.js"></script>
     <style>
         body {
@@ -25,10 +25,17 @@
         .error {
             color: red;
         }
+        #debug {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
-    <h1>LIFF テストページ</h1>
+    <h1>LIFF テスト</h1>
     <p id="initStatus">LIFF 初期化中...</p>
     <div id="profile" style="display: none;">
         <h2>プロフィール情報</h2>
@@ -36,35 +43,62 @@
         <p><strong>ユーザーID:</strong> <span id="userId"></span></p>
         <img id="profileImage" src="" alt="プロフィール画像">
     </div>
+    
+    <button onclick="reloadPage()">ページをリロード</button>
+
+    <div id="debug">
+        <h3>デバッグ情報</h3>
+        <p><strong>LIFF 初期化:</strong> <span id="debugInit">待機中</span></p>
+        <p><strong>ネットワーク状況:</strong> <span id="debugNetwork">確認中...</span></p>
+        <p><strong>エラーメッセージ:</strong> <span id="debugError">なし</span></p>
+    </div>
 
     <script>
-        // LIFFアプリのIDを指定
-        const LIFF_ID = "2006800453"; // ここに自身のLIFF IDを記入
+        const LIFF_ID = "2006800453";  // ここに正しい LIFF ID を記入してください
 
-        // LIFFの初期化
-        liff.init({
-            liffId: LIFF_ID
-        }).then(() => {
-            document.getElementById("initStatus").innerHTML = "LIFF 初期化成功!";
-            document.getElementById("initStatus").classList.add("status");
-            getUserProfile();
-        }).catch(err => {
-            document.getElementById("initStatus").innerHTML = "LIFF 初期化失敗: " + err;
-            document.getElementById("initStatus").classList.add("error");
-        });
+        async function initializeLIFF() {
+            try {
+                await liff.init({ liffId: LIFF_ID });
+                document.getElementById("initStatus").innerHTML = "LIFF 初期化成功!";
+                document.getElementById("initStatus").classList.add("status");
+                document.getElementById("debugInit").innerText = "成功";
+                getUserProfile();
+            } catch (error) {
+                document.getElementById("initStatus").innerHTML = "LIFF 初期化失敗: " + error.message;
+                document.getElementById("initStatus").classList.add("error");
+                document.getElementById("debugError").innerText = error.message;
+            }
+        }
 
-        // ユーザープロフィールを取得
-        function getUserProfile() {
-            liff.getProfile().then(profile => {
+        async function getUserProfile() {
+            try {
+                const profile = await liff.getProfile();
                 document.getElementById("profile").style.display = "block";
                 document.getElementById("displayName").innerText = profile.displayName;
                 document.getElementById("userId").innerText = profile.userId;
                 document.getElementById("profileImage").src = profile.pictureUrl;
-            }).catch(err => {
-                document.getElementById("initStatus").innerHTML = "プロフィール情報の取得に失敗しました: " + err;
+            } catch (error) {
+                document.getElementById("initStatus").innerHTML = "プロフィール取得に失敗: " + error.message;
                 document.getElementById("initStatus").classList.add("error");
-            });
+                document.getElementById("debugError").innerText = error.message;
+            }
         }
+
+        function checkNetworkStatus() {
+            if (navigator.onLine) {
+                document.getElementById("debugNetwork").innerText = "オンライン";
+            } else {
+                document.getElementById("debugNetwork").innerText = "オフライン（接続を確認してください）";
+            }
+        }
+
+        function reloadPage() {
+            location.reload();
+        }
+
+        // LIFF 初期化の呼び出し
+        initializeLIFF();
+        checkNetworkStatus();
     </script>
 </body>
 </html>
