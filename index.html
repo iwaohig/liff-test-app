@@ -3,39 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIFF デバッグ</title>
+    <title>LIFF テスト（PC対応）</title>
     <script src="https://static.line-scdn.net/liff/2.22.1/sdk.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
-        }
-        #profile img {
-            border-radius: 50%;
-            width: 100px;
-            height: 100px;
-            margin-top: 10px;
-        }
-        .status {
-            font-weight: bold;
-            margin-top: 20px;
-            color: green;
-        }
-        .error {
-            color: red;
-        }
-        #debug {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
-            text-align: left;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        #profile img { border-radius: 50%; width: 100px; height: 100px; margin-top: 10px; }
+        .status { font-weight: bold; margin-top: 20px; color: green; }
+        .error { color: red; }
     </style>
 </head>
 <body>
-    <h1>LIFF テスト</h1>
+    <h1>LIFF テストページ（PC対応）</h1>
     <p id="initStatus">LIFF 初期化中...</p>
     <div id="profile" style="display: none;">
         <h2>プロフィール情報</h2>
@@ -44,29 +22,28 @@
         <img id="profileImage" src="" alt="プロフィール画像">
     </div>
     
-    <button onclick="reloadPage()">ページをリロード</button>
-
-    <div id="debug">
-        <h3>デバッグ情報</h3>
-        <p><strong>LIFF 初期化:</strong> <span id="debugInit">待機中</span></p>
-        <p><strong>ネットワーク状況:</strong> <span id="debugNetwork">確認中...</span></p>
-        <p><strong>エラーメッセージ:</strong> <span id="debugError">なし</span></p>
-    </div>
-
     <script>
-        const LIFF_ID = "2006800453";  // ここに正しい LIFF ID を記入してください
+        const LIFF_ID = "2006800453";  // ここに正しい LIFF ID を入力してください
 
         async function initializeLIFF() {
             try {
-                await liff.init({ liffId: LIFF_ID });
+                await liff.init({ 
+                    liffId: LIFF_ID, 
+                    withLoginOnExternalBrowser: true  // PCブラウザでログインを許可
+                });
                 document.getElementById("initStatus").innerHTML = "LIFF 初期化成功!";
                 document.getElementById("initStatus").classList.add("status");
-                document.getElementById("debugInit").innerText = "成功";
+
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                    return;
+                }
+
                 getUserProfile();
             } catch (error) {
                 document.getElementById("initStatus").innerHTML = "LIFF 初期化失敗: " + error.message;
                 document.getElementById("initStatus").classList.add("error");
-                document.getElementById("debugError").innerText = error.message;
+                console.error("LIFF初期化エラー:", error);
             }
         }
 
@@ -77,28 +54,14 @@
                 document.getElementById("displayName").innerText = profile.displayName;
                 document.getElementById("userId").innerText = profile.userId;
                 document.getElementById("profileImage").src = profile.pictureUrl;
+                console.log("プロフィール取得成功:", profile);
             } catch (error) {
                 document.getElementById("initStatus").innerHTML = "プロフィール取得に失敗: " + error.message;
-                document.getElementById("initStatus").classList.add("error");
-                document.getElementById("debugError").innerText = error.message;
+                console.error("プロフィール取得エラー:", error);
             }
         }
 
-        function checkNetworkStatus() {
-            if (navigator.onLine) {
-                document.getElementById("debugNetwork").innerText = "オンライン";
-            } else {
-                document.getElementById("debugNetwork").innerText = "オフライン（接続を確認してください）";
-            }
-        }
-
-        function reloadPage() {
-            location.reload();
-        }
-
-        // LIFF 初期化の呼び出し
         initializeLIFF();
-        checkNetworkStatus();
     </script>
 </body>
 </html>
