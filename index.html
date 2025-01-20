@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIFF テスト（PC対応）</title>
-    <script defer src="https://static.line-scdn.net/liff/2.22.3/sdk.js"></script>
+    <title>LIFF テスト</title>
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
         #profile img { border-radius: 50%; width: 100px; height: 100px; margin-top: 10px; }
@@ -13,7 +13,7 @@
     </style>
 </head>
 <body>
-    <h1>LIFF テストページ（PC対応）</h1>
+    <h1>LIFF テストページ</h1>
     <p id="initStatus">LIFF 初期化中...</p>
     <div id="profile" style="display: none;">
         <h2>プロフィール情報</h2>
@@ -22,15 +22,16 @@
         <img id="profileImage" src="" alt="プロフィール画像">
     </div>
     
-    <script defer>
+    <script>
         const LIFF_ID = "2006800453";  // ここに正しい LIFF ID を入力してください
 
         async function initializeLIFF() {
             try {
                 await liff.init({ 
                     liffId: LIFF_ID, 
-                    withLoginOnExternalBrowser: true  // PCブラウザでログインを許可
+                    withLoginOnExternalBrowser: true  // PCブラウザ対応
                 });
+
                 document.getElementById("initStatus").innerHTML = "LIFF 初期化成功!";
                 document.getElementById("initStatus").classList.add("status");
 
