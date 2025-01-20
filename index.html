@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIFF テスト</title>
+    <script src="https://static.line-scdn.net/liff/2.22.1/sdk.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        #profile img {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            margin-top: 10px;
+        }
+        .status {
+            font-weight: bold;
+            margin-top: 20px;
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>LIFF テストページ</h1>
+    <p id="initStatus">LIFF 初期化中...</p>
+    <div id="profile" style="display: none;">
+        <h2>プロフィール情報</h2>
+        <p><strong>名前:</strong> <span id="displayName"></span></p>
+        <p><strong>ユーザーID:</strong> <span id="userId"></span></p>
+        <img id="profileImage" src="" alt="プロフィール画像">
+    </div>
+
+    <script>
+        // LIFFアプリのIDを指定
+        const LIFF_ID = "2006800453"; // ここに自身のLIFF IDを記入
+
+        // LIFFの初期化
+        liff.init({
+            liffId: LIFF_ID
+        }).then(() => {
+            document.getElementById("initStatus").innerHTML = "LIFF 初期化成功!";
+            document.getElementById("initStatus").classList.add("status");
+            getUserProfile();
+        }).catch(err => {
+            document.getElementById("initStatus").innerHTML = "LIFF 初期化失敗: " + err;
+            document.getElementById("initStatus").classList.add("error");
+        });
+
+        // ユーザープロフィールを取得
+        function getUserProfile() {
+            liff.getProfile().then(profile => {
+                document.getElementById("profile").style.display = "block";
+                document.getElementById("displayName").innerText = profile.displayName;
+                document.getElementById("userId").innerText = profile.userId;
+                document.getElementById("profileImage").src = profile.pictureUrl;
+            }).catch(err => {
+                document.getElementById("initStatus").innerHTML = "プロフィール情報の取得に失敗しました: " + err;
+                document.getElementById("initStatus").classList.add("error");
+            });
+        }
+    </script>
+</body>
+</html>
