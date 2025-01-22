@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIFF QR コードデモ</title>
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        #profile img { border-radius: 50%; width: 100px; height: 100px; margin-top: 10px; }
+        .status { font-weight: bold; margin-top: 20px; color: green; }
+        .error { color: red; }
+        #qrcode { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>LIFF QR コードデモ</h1>
+    <p id="initStatus">LIFF 初期化中...</p>
+    <div id="profile" style="display: none;">
+        <p>こんにちは、<span id="displayName"></span> さん！</p>
+        <p><strong>ユーザーID:</strong> <span id="userId"></span></p>
+        <img id="profileImage" src="" alt="プロフィール画像">
+        <div id="qrcode"></div>
+    </div>
+
+    <script>
+        const LIFF_ID = "2006800547-oZ9gQQ2D";  // ここに正しい LIFF ID を入力してください
+
+        async function initializeLIFF() {
+            try {
+                await liff.init({ 
+                    liffId: LIFF_ID, 
+                    withLoginOnExternalBrowser: true  // PCブラウザ対応
+                });
+
+                document.getElementById("initStatus").innerHTML = "LIFF 初期化成功!";
+                document.getElementById("initStatus").classList.add("status");
+
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                    return;
+                }
+
+                getUserProfile();
+            } catch (error) {
+                document.getElementById("initStatus").innerHTML = "LIFF 初期化失敗: " + error.message;
+                document.getElementById("initStatus").classList.add("error");
+                console.error("LIFF初期化エラー:", error);
+            }
+        }
+
+        async function getUserProfile() {
+            try {
+                const profile = await liff.getProfile();
+                document.getElementById("profile").style.display = "block";
+                document.getElementById("displayName").innerText = profile.displayName;
+                document.getElementById("userId").innerText = profile.userId;
+                document.getElementById("profileImage").src = profile.pictureUrl;
+                console.log("プロフィール取得成功:", profile);
+
+                // QRコードに含める情報（JSON化）
+                const qrData = JSON.stringify({
+                    displayName: profile.displayName,
+                    userId: profile.userId,
+                    pictureUrl: profile.pictureUrl
+                });
+
+                // QRコードの生成
+                new QRCode(document.getElementById("qrcode"), {
+                    text: qrData,
+                    width: 200,
+                    height: 200
+                });
+
+            } catch (error) {
+                document.getElementById("initStatus").innerHTML = "プロフィール取得に失敗: " + error.message;
+                console.error("プロフィール取得エラー:", error);
+            }
+        }
+
+        initializeLIFF();
+    </script>
+</body>
+</html>
