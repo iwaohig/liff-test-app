@@ -3,90 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIFF QR コードデモ</title>
+    <title>LIFF 抽選デモ</title>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-        #profile img { border-radius: 50%; width: 100px; height: 100px; margin-top: 10px; }
-        .status { font-weight: bold; margin-top: 20px; color: green; }
-        .error { color: red; }
-        #qrcode { margin-top: 20px; }
+        #result { font-size: 24px; font-weight: bold; margin-top: 20px; }
+        .button { padding: 15px 30px; font-size: 20px; margin-top: 20px; cursor: pointer; }
+        #prizes { display: none; margin-top: 20px; }
+        .prize-btn { padding: 10px 20px; margin: 10px; font-size: 18px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h1>LIFF QR コードデモ（エンコード版）</h1>
-    <p id="initStatus">LIFF 初期化中...</p>
-    <div id="profile" style="display: none;">
-        <p>こんにちは、<span id="displayName"></span> さん！</p>
-        <p><strong>ユーザーID:</strong> <span id="userId"></span></p>
-        <img id="profileImage" src="" alt="プロフィール画像">
-        <div id="qrcode"></div>
+    <h1>LIFF 抽選デモ</h1>
+    <button class="button" onclick="drawLottery()">抽選する</button>
+    <p id="result">結果がここに表示されます</p>
+
+    <div id="prizes">
+        <h2>賞品を選択してください:</h2>
+        <button id="prize1" class="prize-btn" onclick="selectPrize(1)">賞品 1</button>
+        <button id="prize2" class="prize-btn" onclick="selectPrize(2)">賞品 2</button>
     </div>
 
     <script>
-        const LIFF_ID = "2006800547-oZ9gQQ2D";  // ここに正しい LIFF ID を入力してください
+        const LIFF_ID = "2006800547-oZ9gQQ2D";  // ここに正しい LIFF ID を設定してください
 
         async function initializeLIFF() {
             try {
-                await liff.init({ 
-                    liffId: LIFF_ID, 
-                    withLoginOnExternalBrowser: true  // PCブラウザ対応
-                });
-
-                document.getElementById("initStatus").innerHTML = "LIFF 初期化成功!";
-                document.getElementById("initStatus").classList.add("status");
-
+                await liff.init({ liffId: LIFF_ID });
                 if (!liff.isLoggedIn()) {
                     liff.login();
-                    return;
                 }
-
-                getUserProfile();
             } catch (error) {
-                document.getElementById("initStatus").innerHTML = "LIFF 初期化失敗: " + error.message;
-                document.getElementById("initStatus").classList.add("error");
-                console.error("LIFF初期化エラー:", error);
+                alert("LIFFの初期化に失敗しました: " + error.message);
             }
         }
 
-        async function getUserProfile() {
-            try {
-                const profile = await liff.getProfile();
-                document.getElementById("profile").style.display = "block";
-                document.getElementById("displayName").innerText = profile.displayName;
-                document.getElementById("userId").innerText = profile.userId;
-                document.getElementById("profileImage").src = profile.pictureUrl;
-                console.log("プロフィール取得成功:", profile);
+        // 抽選処理
+        function drawLottery() {
+            const lotteryResults = [
+                { rank: "1等", prizes: ["高級ホテル宿泊券", "高級ディナー招待券"] },
+                { rank: "2等", prizes: ["ギフトカード 5000円", "カフェ無料券"] },
+                { rank: "3等", prizes: ["ドリンク無料券", "お菓子セット"] }
+            ];
 
-                // QRコードに埋め込むデータ
-                const profileData = {
-                    displayName: profile.displayName,
-                    userId: profile.userId,
-                    pictureUrl: profile.pictureUrl
-                };
+            // ランダムに抽選結果を選択
+            const result = lotteryResults[Math.floor(Math.random() * lotteryResults.length)];
+            
+            // 結果を表示
+            document.getElementById("result").innerText = `${result.rank} が当たりました！`;
+            
+            // 賞品選択ボタンを更新して表示
+            document.getElementById("prizes").style.display = "block";
+            document.getElementById("prize1").innerText = result.prizes[0];
+            document.getElementById("prize2").innerText = result.prizes[1];
 
-                // 1. JSON化
-                const jsonData = JSON.stringify(profileData);
+            // 選択用のデータを保存
+            document.getElementById("prize1").dataset.prize = result.prizes[0];
+            document.getElementById("prize2").dataset.prize = result.prizes[1];
+        }
 
-                // 2. LZString で圧縮・Base64エンコード
-                const compressedData = LZString.compressToEncodedURIComponent(jsonData);
+        // 賞品選択処理
+        function selectPrize(choice) {
+            const selectedPrize = document.getElementById(`prize${choice}`).dataset.prize;
+            sendMessage(selectedPrize);
+        }
 
-                // QRコードの生成
-                new QRCode(document.getElementById("qrcode"), {
-                    text: compressedData,
-                    width: 200,
-                    height: 200,
-                    correctLevel: QRCode.CorrectLevel.L  // 訂正レベルをLに設定して容量を増やす
-                });
-
-                console.log("圧縮データ:", compressedData);
-
-            } catch (error) {
-                document.getElementById("initStatus").innerHTML = "プロフィール取得に失敗: " + error.message;
-                console.error("プロフィール取得エラー:", error);
-            }
+        // LINEトークにメッセージ送信
+        function sendMessage(prize) {
+            liff.sendMessages([
+                {
+                    type: "text",
+                    text: `おめでとうございます！あなたは「${prize}」を選択しました！`
+                }
+            ]).then(() => {
+                alert("選択内容を送信しました！");
+            }).catch((err) => {
+                alert("送信に失敗しました: " + err.message);
+            });
         }
 
         initializeLIFF();
