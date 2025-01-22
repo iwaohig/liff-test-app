@@ -6,6 +6,7 @@
     <title>LIFF QR コードデモ</title>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
         #profile img { border-radius: 50%; width: 100px; height: 100px; margin-top: 10px; }
@@ -15,7 +16,7 @@
     </style>
 </head>
 <body>
-    <h1>LIFF QR コードデモ</h1>
+    <h1>LIFF QR コードデモ（エンコード版）</h1>
     <p id="initStatus">LIFF 初期化中...</p>
     <div id="profile" style="display: none;">
         <p>こんにちは、<span id="displayName"></span> さん！</p>
@@ -59,19 +60,28 @@
                 document.getElementById("profileImage").src = profile.pictureUrl;
                 console.log("プロフィール取得成功:", profile);
 
-                // QRコードに含める情報（JSON化）
-                const qrData = JSON.stringify({
+                // QRコードに埋め込むデータ
+                const profileData = {
                     displayName: profile.displayName,
                     userId: profile.userId,
                     pictureUrl: profile.pictureUrl
-                });
+                };
+
+                // 1. JSON化
+                const jsonData = JSON.stringify(profileData);
+
+                // 2. LZString で圧縮・Base64エンコード
+                const compressedData = LZString.compressToEncodedURIComponent(jsonData);
 
                 // QRコードの生成
                 new QRCode(document.getElementById("qrcode"), {
-                    text: qrData,
+                    text: compressedData,
                     width: 200,
-                    height: 200
+                    height: 200,
+                    correctLevel: QRCode.CorrectLevel.L  // 訂正レベルをLに設定して容量を増やす
                 });
+
+                console.log("圧縮データ:", compressedData);
 
             } catch (error) {
                 document.getElementById("initStatus").innerHTML = "プロフィール取得に失敗: " + error.message;
