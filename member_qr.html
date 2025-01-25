@@ -84,7 +84,7 @@
 </head>
 <body>
     <h1>LIFF 抽選デモ</h1>
-    <button class="button" onclick="drawLottery()">抽選する</button>
+    <button id="drawButton" class="button" onclick="drawLottery()">抽選する</button>
     <p id="result">結果がここに表示されます</p>
 
     <div id="prizes">
@@ -118,6 +118,9 @@
             // ランダムに抽選結果を選択
             const result = lotteryResults[Math.floor(Math.random() * lotteryResults.length)];
             
+            // 抽選ボタンを非表示にする
+            document.getElementById("drawButton").style.display = "none";
+
             // 結果を表示
             document.getElementById("result").innerText = `${result.rank} が当たりました！`;
             
