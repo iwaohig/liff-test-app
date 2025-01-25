@@ -6,11 +6,80 @@
     <title>LIFF 抽選デモ</title>
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-        #result { font-size: 24px; font-weight: bold; margin-top: 20px; }
-        .button { padding: 15px 30px; font-size: 20px; margin-top: 20px; cursor: pointer; }
-        #prizes { display: none; margin-top: 20px; }
-        .prize-btn { padding: 10px 20px; margin: 10px; font-size: 18px; cursor: pointer; }
+        /* ベーススタイル */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .button {
+            background: #ff6b6b;
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:hover {
+            background: #ff4757;
+            transform: translateY(-3px);
+        }
+
+        #result {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 30px;
+            color: #ffea00;
+        }
+
+        #prizes {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .prize-btn {
+            background: #1dd1a1;
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            padding: 15px 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .prize-btn:hover {
+            background: #10ac84;
+            transform: translateY(-3px);
+        }
+
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -41,9 +110,9 @@
         // 抽選処理
         function drawLottery() {
             const lotteryResults = [
-                { rank: "1等", prizes: ["高級ホテル宿泊券", "高級ディナー招待券"] },
-                { rank: "2等", prizes: ["ギフトカード 5000円", "カフェ無料券"] },
-                { rank: "3等", prizes: ["ドリンク無料券", "お菓子セット"] }
+                { rank: "🎉 1等", prizes: ["高級ホテル宿泊券", "高級ディナー招待券"] },
+                { rank: "🎊 2等", prizes: ["ギフトカード 5000円", "カフェ無料券"] },
+                { rank: "🎁 3等", prizes: ["ドリンク無料券", "お菓子セット"] }
             ];
 
             // ランダムに抽選結果を選択
