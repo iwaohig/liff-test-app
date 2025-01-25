@@ -46,6 +46,27 @@
             transform: translateY(-3px);
         }
 
+        #userProfile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #profileImage {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+            border: 3px solid #fff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        #userName {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
         #result {
             font-size: 2rem;
             font-weight: bold;
@@ -84,6 +105,12 @@
 </head>
 <body>
     <h1>LIFF 抽選デモ</h1>
+
+    <div id="userProfile">
+        <img id="profileImage" src="https://via.placeholder.com/100" alt="プロフィール画像">
+        <p id="userName">こんにちは、ゲストさん</p>
+    </div>
+
     <button id="drawButton" class="button" onclick="drawLottery()">抽選する</button>
     <p id="result">結果がここに表示されます</p>
 
@@ -102,6 +129,12 @@
                 if (!liff.isLoggedIn()) {
                     liff.login();
                 }
+
+                // ユーザー情報の取得
+                const profile = await liff.getProfile();
+                document.getElementById("userName").innerText = `こんにちは、${profile.displayName} さん`;
+                document.getElementById("profileImage").src = profile.pictureUrl;
+
             } catch (error) {
                 alert("LIFFの初期化に失敗しました: " + error.message);
             }
